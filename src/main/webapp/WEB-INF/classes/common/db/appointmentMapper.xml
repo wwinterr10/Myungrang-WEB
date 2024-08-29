@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hospital.dao.AppointmentDAO">
+
+	<resultMap type="memberVO" id="memberMap">
+		<result column="birth_date" property="birthDate"></result>
+		<result column="basic_addr" property="basicAddr"></result>
+		<result column="detail_addr" property="detailAddr"></result>
+		<result column="reg_date" property="regDate"></result>
+	</resultMap>
+	
+	<resultMap type="dogVO" id="dogMap">
+		<result column="member_id" property="memberId"></result>
+		<result column="birth_date" property="birthDate"></result>
+		<result column="breed_code" property="breedCode"></result>
+	</resultMap>
+
+	<resultMap type="breedVO" id="breedMap">
+		<result column="dog_size" property="dogSize"></result>
+		<result column="breed_name" property="breedName"></result>
+	</resultMap>
+	
+	<resultMap type="appointmentVO" id="appointmentMap">
+		<result column="dog_no" property="dogNo"></result>
+		<result column="member_id" property="memberId"></result>
+		<result column="appointment_date" property="appointmentDate"></result>
+		<result column="appointment_time" property="appointmentTime"></result>
+	</resultMap>
+	
+	<!-- 
+	<resultMap type="diseaseVO" id="diseaseMap">
+		<result column="disease_code" property="diseaseCode"></result>
+		<result column="disease_name" property="diseaseName"></result>
+	</resultMap>
+	
+	<resultMap type="healthVO" id="healthMap">
+		<result column="dog_no" property="dogNo"></result>
+		<result column="visit_date" property="visitDate"></result>
+		<result column="disease_code" property="diseaseCode"></result>
+	</resultMap>
+	 -->
+	 
+	 <!-- 예약 DAO
+	 		1. 날짜 선택 시 예약이 가능한 날짜/시간인지 확인(select)
+	 		2. 예약 확정 시 테이블에 레코드 삽입
+	 		3. 예약 확인 : 로그인한 아이디로 예약한 정보 조회(select)
+	 		4. 예약 변경 : 예약 조회 후 예약정보 변경(update)
+	 		5. 예약 취소 : 예약 조회 후 예약정보 취소(delete)
+	  -->
+	<!-- select + from절 sql로 묶기 -->
+	<sql id="select">
+			select no, dog_no, member_id, to_char(appointment_date, 'yyyy-mm-dd') as appointment_date, appointment_time
+			  from appointment
+	</sql>
+	
+	<!-- 전체 예약 조회 -->
+	<select id="selectAll" resultMap="appointmentMap">
+		<include refid="select" />
+	</select>
+	
+	<!-- 현재시간 이후 예약 조회 -->
+	<select id="selectCurrent" resultMap="appointmentMap">
+		<include refid="select" />
+		where to_char(appointment_date, 'yy-mm-dd') >= to_char(sysdate, 'yy-mm-dd')
+		order by appointment_date, appointment_time
+	</select>
+	
+	<!-- 회원 id를 통한 예약 조회 -->
+	<select id="selectMember" resultMap="appointmentMap" parameterType="memberVO">
+		<include refid="select" />
+		where member_id = #{id}
+	</select>
+	
+	<!-- 예약 데이터 저장 -->
+	<insert id="saveAppointment" parameterType="appointmentVO">
+		insert into appointment(no, dog_no, member_id, appointment_date, appointment_time)
+		values(seq_appointment_no.nextval, #{dogNo}, #{memberId}, #{appointmentDate}, #{appointmentTime})
+	</insert>
+	
+	<!-- 예약 변경 -->
+	<update id="updateAppointment" parameterType="appointmentVO">
+		update appointment set appointment_date = #{appointmentDate}
+		where no = #{no}
+	</update>
+	
+	<delete id="deleteAppointment" parameterType="int">
+		delete from appointment where no = #{no}
+	</delete>
+	
+</mapper>

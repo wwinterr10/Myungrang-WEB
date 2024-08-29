@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hospital.dao.DogDAO">
+	<sql id="select">
+		select * from dog 
+	</sql>
+	
+	<select id="selectDog" resultMap="myDog">
+		select d.*, b.breed_name as breed_name from dog d
+		join breed b on b.no = d.breed_code
+		where member_id = #{id}
+	</select>
+	
+	<resultMap type="dogVO" id="myDog">
+		<result column="no" property="no" />
+		<result column="member_id" property="memberId" />
+		<result column="name" property="name" />
+		<result column="birth_date" property="birthDate" />
+		<result column="breed_code" property="breedCode"/>
+		<result column="breed_name" property="breedName"/>
+	</resultMap>
+
+	<resultMap type="int" id="DogNoMap">
+		<result column="no"  property="no"/>
+		<collection property="dogList" resultMap="myDogMap"></collection>
+	</resultMap>	
+	
+	<select id="selectDogHealth" resultMap="dogHealth">
+		select h.no, h.dog_no, h.visit_date, h.disease_code, h.significant,
+				d.name as dog_name, d2.disease_name as disease_name,
+				d.member_id as member_id
+		  from health h join dog d on d.no = h.dog_no
+		  JOIN disease d2 ON d2.DISEASE_CODE = h.DISEASE_CODE
+		  join member m on m.id = d.member_id
+		where dog_no = #{no}
+		order by visit_date
+	</select>
+	
+	<select id="memberDogHealth" resultMap="dogHealth">
+		select h.no, h.dog_no, h.visit_date, h.disease_code, h.significant,
+				d.name as dog_name, d2.disease_name as disease_name,
+				d.member_id as member_id
+		  from health h join dog d on d.no = h.dog_no
+		  JOIN disease d2 ON d2.DISEASE_CODE = h.DISEASE_CODE
+		  join member m on m.id = d.member_id
+		where d.member_id = #{id}
+		order by visit_date
+	</select>
+	
+	<resultMap type="healthVO" id="dogHealth">
+		<result column="no" property="no" />
+		<result column="dog_no" property="dogNo" />
+		<result column="visit_date" property="visitDate" />
+		<result column="disease_code" property="diseaseCode" />
+		<result column="significant" property="significant" />
+		<result column="dog_name" property="dogName" />
+		<result column="disease_name" property="diseaseName" />
+		<result column="member_id" property="memberId" />
+	</resultMap>
+	
+	<delete id="deleteDogHealthInfo" parameterType="int">
+		delete from health where no = #{no}
+	</delete>
+	
+	<insert id="insertDogInfo">
+		insert into dog(no, member_id, name, birth_date, breed_code)
+		values(seq_dog_no.nextval, #{memberId}, #{name}, #{birthDate}, #{breedCode})
+	</insert>
+</mapper>

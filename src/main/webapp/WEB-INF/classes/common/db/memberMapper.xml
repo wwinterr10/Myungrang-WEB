@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hospital.dao.MemberDAO">
+
+
+	<resultMap type="dogVO" id="dogMap">
+		<result column="member_id" property="memberId"></result>
+		<result column="birth_date" property="birthDate"></result>
+		<result column="breed_code" property="breedCode"></result>
+		<result column="no" property="no"></result>
+	</resultMap>
+
+	<resultMap type="breedVO" id="breedMap">
+		<result column="dog_size" property="dogSize"></result>
+		<result column="breed_name" property="breedName"></result>
+	</resultMap>
+
+	<resultMap type="diseaseVO" id="diseaseMap">
+		<result column="disease_code" property="diseaseCode"></result>
+		<result column="disease_name" property="diseaseName"></result>
+	</resultMap>
+	
+	<resultMap type="healthVO" id="healthMap">
+		<result column="dog_no" property="dogNo"></result>
+		<result column="visit_date" property="visitDate"></result>
+		<result column="disease_code" property="diseaseCode"></result>
+	</resultMap>
+	
+	<sql id="select">
+		select m.id, m.password, m.name, m.birth_date, m.phone, m.email,
+				to_char(m.birth_date, 'yyyy-mm-dd') AS birth_date,
+				to_char('(' || m.post || ') ' || m.basic_addr || ' ' || m.detail_addr) as basic_addr,
+				to_char(m.reg_date, 'yyyy-mm-dd') AS reg_date,
+				m.grade, m.admin, m.oauth,
+		        d.name as dog_name,
+		        d.breed_code, d.no
+		  from member m
+	</sql>
+	
+	<select id="selectMemberWithDog" resultMap="withDogMap">
+		select m.id, m.password, m.name, m.birth_date, m.phone, m.email,
+				to_char(m.birth_date, 'yyyy-mm-dd') AS birth_date,
+				to_char('(' || m.post || ') ' || m.basic_addr || ' ' || m.detail_addr) as basic_addr,
+				to_char(m.reg_date, 'yyyy-mm-dd') AS reg_date,
+				m.grade, m.admin, m.oauth,
+		        d.name as dog_name,
+		        d.birth_date as dog_birth,
+		        d.breed_code, d.no
+		  from member m, dog d
+		  where m.id=d.member_id and m.id=#{id}
+	</select>
+	
+	<resultMap type="memberVO" id="withDogMap">
+		<result column="id"  property="id"/>
+		<result column="password" property="password"/>
+		<result column="name"  property="name"/>
+		<result column="birth_date"  property="birthDate"/>
+		<result column="phone"  property="phone"/>
+		<result column="email"  property="email"/>
+		<result column="basic_addr"  property="basicAddr"/>
+		<result column="grade"  property="grade"/>
+		<result column="admin"  property="admin"/>
+		<collection property="dogList" resultMap="myDogMap"></collection>
+	</resultMap>
+	
+	<resultMap type="dogVO" id="myDogMap">
+		<result column="no" property="no" />
+		<result column="member_id" property="memberId" />
+		<result column="dog_name" property="name" />
+		<result column="birth_date" property="birthDate" />
+		<result column="breed_code" property="breedCode"/>
+		<result column="dog_birth" property="birthDate"/>
+	</resultMap>
+	
+	<select id="selectMember" resultMap="memberMap">
+		select m.id, m.password, m.name, m.birth_date, m.phone, m.email,
+				to_char(m.birth_date, 'yyyy-mm-dd') AS birth_date,
+				to_char('(' || m.post || ') ' || m.basic_addr || ' ' || m.detail_addr) as basic_addr,
+				to_char(m.reg_date, 'yyyy-mm-dd') AS reg_date,
+				m.grade, m.admin, m.oauth
+		  from member m
+		 where id = #{id}
+	</select>
+	
+	<resultMap type="memberVO" id="memberMap">
+		<result column="birth_date"  property="birthDate"/>
+		<result column="basic_addr"  property="basicAddr"/>
+	</resultMap>
+	
+
+	<update id="changePassword" parameterType="memberVO">
+		update member set password = #{password} where id = #{id}
+	</update>
+	
+	<update id="updateMyInfo" parameterType="memberVO">
+		update member
+		set password = #{password}, name = #{name}, birth_date = #{birthDate},
+			phone = #{phone}, email = #{email}
+		where id = #{id}
+	</update>
+	
+</mapper>
