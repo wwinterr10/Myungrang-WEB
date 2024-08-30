@@ -1,9 +1,9 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-src/main/WEB-INF/css/** linguist-documentation=ture
-src/main/WEB-INF/scss/** linguist-documentation=ture
-src/main/WEB-INF/css/** linguist-vendored=ture
-src/main/WEB-INF/scss/** linguist-vendored=ture
+src/main/WEB-INF/css/** linguist-documentation=true
+src/main/WEB-INF/scss/** linguist-documentation=true
+src/main/WEB-INF/css/** linguist-vendored=true
+src/main/WEB-INF/scss/** linguist-vendored=true
 
 *linguist-vendored
 *.java linguist-vendored=false
