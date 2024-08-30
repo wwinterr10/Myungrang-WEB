@@ -6,8 +6,6 @@ src/main/WEB-INF/scss/** linguist-documentation=ture
 *linguist-vendored
 *.java linguist-vendored=false
 *.py linguist-vendored=false
-*.jsp linguist-vendored=false
-*.js linguist-vendored=true
 *.html linguist-vendored=false
 *.xml linguist-vendored=false
 
